@@ -79,35 +79,35 @@ can be included into your project.</p>
 
 <p>Allows starting a Unity-based coroutine from any instance.</p>
 
-<pre><code>class SomeClass {
-  public void Do(){
-    CoroutineStarter.Instance.Add(doLazy());
-  }
-  private IEnumerator doLazy(){
-    yield return UnityEngine.WaitForSeconds(5f);
-    UnityEngine.Debug.Log("This should be invoked as a coroutine");
-  }
-}
-</code></pre>
+<div class="highlight highlight-csharp"><pre><span class="k">class</span> <span class="nc">SomeClass</span> <span class="p">{</span>
+  <span class="k">public</span> <span class="k">void</span> <span class="nf">Do</span><span class="p">(){</span>
+    <span class="n">CoroutineStarter</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">doLazy</span><span class="p">());</span>
+  <span class="p">}</span>
+  <span class="k">private</span> <span class="n">IEnumerator</span> <span class="nf">doLazy</span><span class="p">(){</span>
+    <span class="k">yield</span> <span class="k">return</span> <span class="n">UnityEngine</span><span class="p">.</span><span class="n">WaitForSeconds</span><span class="p">(</span><span class="m">5f</span><span class="p">);</span>
+    <span class="n">UnityEngine</span><span class="p">.</span><span class="n">Debug</span><span class="p">.</span><span class="n">Log</span><span class="p">(</span><span class="s">"This should be invoked as a coroutine"</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
 
 <h3>
 <a name="cachet" class="anchor" href="#cachet"><span class="octicon octicon-link"></span></a>Cache&lt;T&gt;</h3>
 
 <p>Provides a generic cache for any kind of objects which loading might need some time and can be referenced by a string key.</p>
 
-<pre><code>class SomeClass{
-  private readonly Cache&lt;UnityEngine.GameObject&gt; cache;
-  public SomeClass(){
-    cache = new Cache&lt;UnityEngine.GameObject&gt;(resolveGameObject);
-  }
-  public void Do(){
-    cache.Get("MyBigGameObject", (go) =&gt; go.transform.position = UnityEngine.Vector3.zero);
-  }
-  private GameObject resolveGameObject(string key){
-    UnityEngine.Resources.Load&lt;GameObject&gt;(key);
-  }
-}
-</code></pre>
+<div class="highlight highlight-csharp"><pre><span class="k">class</span> <span class="nc">SomeClass</span><span class="p">{</span>
+  <span class="k">private</span> <span class="k">readonly</span> <span class="n">Cache</span><span class="p">&lt;</span><span class="n">UnityEngine</span><span class="p">.</span><span class="n">GameObject</span><span class="p">&gt;</span> <span class="n">cache</span><span class="p">;</span>
+  <span class="k">public</span> <span class="nf">SomeClass</span><span class="p">(){</span>
+    <span class="n">cache</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Cache</span><span class="p">&lt;</span><span class="n">UnityEngine</span><span class="p">.</span><span class="n">GameObject</span><span class="p">&gt;(</span><span class="n">resolveGameObject</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">public</span> <span class="k">void</span> <span class="nf">Do</span><span class="p">(){</span>
+    <span class="n">cache</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s">"MyBigGameObject"</span><span class="p">,</span> <span class="p">(</span><span class="n">go</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="n">go</span><span class="p">.</span><span class="n">transform</span><span class="p">.</span><span class="n">position</span> <span class="p">=</span> <span class="n">UnityEngine</span><span class="p">.</span><span class="n">Vector3</span><span class="p">.</span><span class="n">zero</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">private</span> <span class="n">GameObject</span> <span class="nf">resolveGameObject</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">){</span>
+    <span class="n">UnityEngine</span><span class="p">.</span><span class="n">Resources</span><span class="p">.</span><span class="n">Load</span><span class="p">&lt;</span><span class="n">GameObject</span><span class="p">&gt;(</span><span class="n">key</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
 
 <h3>
 <a name="timing--itiming" class="anchor" href="#timing--itiming"><span class="octicon octicon-link"></span></a>Timing / ITiming</h3>
@@ -119,20 +119,20 @@ can be included into your project.</p>
 <li>Every(seconds, callback): Invokes a callback every x seconds. First time in x seconds.</li>
 </ul>
 
-<pre><code>// In the best case inject a Timing instance
-[Inject]
-public ITiming Timing { get; set; }
+<div class="highlight highlight-csharp"><pre><span class="c1">// In the best case inject a Timing instance</span>
+<span class="na">[Inject]</span>
+<span class="k">public</span> <span class="n">ITiming</span> <span class="n">Timing</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
 
-// Than in your functions created a deferred call
-IDeferred after = Timing.After(5, () =&gt; UnityEngine.Debug.Log("This will be invoked in 5 seconds"));
+<span class="c1">// Than in your functions created a deferred call</span>
+<span class="n">IDeferred</span> <span class="n">after</span> <span class="p">=</span> <span class="n">Timing</span><span class="p">.</span><span class="n">After</span><span class="p">(</span><span class="m">5</span><span class="p">,</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">UnityEngine</span><span class="p">.</span><span class="n">Debug</span><span class="p">.</span><span class="n">Log</span><span class="p">(</span><span class="s">"This will be invoked in 5 seconds"</span><span class="p">));</span>
 
-// You can abort the call (if not already executed)
-after.Abort();
+<span class="c1">// You can abort the call (if not already executed)</span>
+<span class="n">after</span><span class="p">.</span><span class="n">Abort</span><span class="p">();</span>
 
-// Also a interval-based variant is available for convience
-Timing.Every(5, () =&gt; UnityEnging.Debug.Log("This will be invoked EVERY 5 seconds"));
+<span class="c1">// Also a interval-based variant is available for convience</span>
+<span class="n">Timing</span><span class="p">.</span><span class="n">Every</span><span class="p">(</span><span class="m">5</span><span class="p">,</span> <span class="p">()</span> <span class="p">=&gt;</span> <span class="n">UnityEnging</span><span class="p">.</span><span class="n">Debug</span><span class="p">.</span><span class="n">Log</span><span class="p">(</span><span class="s">"This will be invoked EVERY 5 seconds"</span><span class="p">));</span>
 
-</code></pre>
+</pre></div>
 
 <p>By using an Dependency-Injection pattern / framework (e.g. <a href="https://github.com/strangeioc/strangeioc">Strange</a>) unit-testing the timing behavior is so easy.</p>
 
