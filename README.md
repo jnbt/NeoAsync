@@ -33,7 +33,7 @@ can be included into your project.
 
 Allows starting a Unity-based coroutine from any instance.
 
-```
+```csharp
 class SomeClass {
   public void Do(){
     CoroutineStarter.Instance.Add(doLazy());
@@ -49,7 +49,7 @@ class SomeClass {
 
 Provides a generic cache for any kind of objects which loading might need some time and can be referenced by a string key.
 
-```
+```csharp
 class SomeClass{
   private readonly Cache<UnityEngine.GameObject> cache;
   public SomeClass(){
@@ -71,7 +71,7 @@ Allows easy time-driven callbacks:
 * After(seconds, callback): Invokes a callback after the timeout in seconds.
 * Every(seconds, callback): Invokes a callback every x seconds. First time in x seconds.
 
-```
+```csharp
 // In the best case inject a Timing instance
 [Inject]
 public ITiming Timing { get; set; }
