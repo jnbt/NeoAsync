@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Neoasync by jnbt</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Neoasync</h1>
+        <p>NeoAsync is a growing toolset to manage asynchronous tasks when programming in Unity3D</p>
+
+        <p class="view"><a href="https://github.com/jnbt/NeoAsync">View the Project on GitHub <small>jnbt/NeoAsync</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/jnbt/NeoAsync/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/jnbt/NeoAsync/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/jnbt/NeoAsync">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="neoasync-a-class-library-for-asynchronous-tasks-in-unity3d" class="anchor" href="#neoasync-a-class-library-for-asynchronous-tasks-in-unity3d"><span class="octicon octicon-link"></span></a>NeoAsync: A class library for asynchronous tasks in <code>Unity3D</code>
+</h1>
+
+<p>NeoAsync is a growing toolset to manage asynchronous tasks when programming in Unity3D</p>
+
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>If you don't have access to <a href="http://msdn.microsoft.com/de-de/vstudio">Microsoft VisualStudio</a> you can just use Unity3D and its compiler.
+Or use your VisualStudio installation in combination with <a href="http://unityvs.com">Visual Studio Tools for Unity</a> to compile a DLL-file, which
+can be included into your project.</p>
+
+<h3>
+<a name="using-unity3d" class="anchor" href="#using-unity3d"><span class="octicon octicon-link"></span></a>Using Unity3D</h3>
+
+<ul>
+<li>Clone the repository</li>
+<li>Copy the files from <code>Assets\NeoAsync</code> into your project</li>
+</ul>
+
+<h3>
+<a name="using-visualstudio" class="anchor" href="#using-visualstudio"><span class="octicon octicon-link"></span></a>Using VisualStudio</h3>
+
+<ul>
+<li>Clone the repository</li>
+<li>Open the folder as a Unity3D project</li>
+<li>Install the <em>free</em> <a href="https://www.assetstore.unity3d.com/#/content/13802">Unity Testing Tools</a> from the AssetStore</li>
+<li>Install the <em>free</em> <a href="http://unityvs.com">Visual Studio Tools for Unity</a> and import its Unity-package</li>
+<li>Open <code>UnityVS.NeoAsync.sln</code>
+</li>
+<li><a href="http://forum.unity3d.com/threads/video-tutorial-how-to-use-visual-studio-for-all-your-unity-development.120327">Build a DLL-File</a></li>
+<li>Import the DLL and dependencies into your Unity3D project</li>
+</ul>
+
+<h2>
+<a name="dependencies" class="anchor" href="#dependencies"><span class="octicon octicon-link"></span></a>Dependencies</h2>
+
+<ul>
+<li><a href="https://github.com/jnbt/NeoCollections">NeoCollections</a></li>
+</ul>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<h3>
+<a name="coroutinestarter" class="anchor" href="#coroutinestarter"><span class="octicon octicon-link"></span></a><code>CoroutineStarter</code>
+</h3>
+
+<p>Allows starting a Unity-based coroutine from any instance.</p>
+
+<pre><code>class SomeClass {
+  public void Do(){
+    CoroutineStarter.Instance.Add(doLazy());
+  }
+  private IEnumerator doLazy(){
+    yield return UnityEngine.WaitForSeconds(5f);
+    UnityEngine.Debug.Log("This should be invoked as a coroutine");
+  }
+}
+</code></pre>
+
+<h3>
+<a name="cachet" class="anchor" href="#cachet"><span class="octicon octicon-link"></span></a>Cache&lt;T&gt;</h3>
+
+<p>Provides a generic cache for any kind of objects which loading might need some time and can be referenced by a string key.</p>
+
+<pre><code>class SomeClass{
+  private readonly Cache&lt;UnityEngine.GameObject&gt; cache;
+  public SomeClass(){
+    cache = new Cache&lt;UnityEngine.GameObject&gt;(resolveGameObject);
+  }
+  public void Do(){
+    cache.Get("MyBigGameObject", (go) =&gt; go.transform.position = UnityEngine.Vector3.zero);
+  }
+  private GameObject resolveGameObject(string key){
+    UnityEngine.Resources.Load&lt;GameObject&gt;(key);
+  }
+}
+</code></pre>
+
+<h3>
+<a name="timing--itiming" class="anchor" href="#timing--itiming"><span class="octicon octicon-link"></span></a>Timing / ITiming</h3>
+
+<p>Allows easy time-driven callbacks:</p>
+
+<ul>
+<li>After(seconds, callback): Invokes a callback after the timeout in seconds.</li>
+<li>Every(seconds, callback): Invokes a callback every x seconds. First time in x seconds.</li>
+</ul>
+
+<pre><code>// In the best case inject a Timing instance
+[Inject]
+public ITiming Timing { get; set; }
+
+// Than in your functions created a deferred call
+IDeferred after = Timing.After(5, () =&gt; UnityEngine.Debug.Log("This will be invoked in 5 seconds"));
+
+// You can abort the call (if not already executed)
+after.Abort();
+
+// Also a interval-based variant is available for convience
+Timing.Every(5, () =&gt; UnityEnging.Debug.Log("This will be invoked EVERY 5 seconds"));
+
+</code></pre>
+
+<p>By using an Dependency-Injection pattern / framework (e.g. <a href="https://github.com/strangeioc/strangeioc">Strange</a>) unit-testing the timing behavior is so easy.</p>
+
+<h2>
+<a name="testing" class="anchor" href="#testing"><span class="octicon octicon-link"></span></a>Testing</h2>
+
+<p>You can run the tests using the offical <a href="https://www.assetstore.unity3d.com/#/content/13802">Unity Testing Tools</a>. Just install the Unity package and use the <a href="http://www.tallior.com/introduction-to-unity-test-tools/">Unit Test Runner</a>.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/jnbt">jnbt</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
