@@ -1,0 +1,4 @@
+using System;namespace Neo.Async{    public class Timing : ITiming{        public IDeferred After(int s, Action cb){      return After((float) s, cb);    }
+        public IDeferred After(float s, Action cb){      IDeferred d = new UnityDeferred(s, cb);      d.Start();      return d;    }
+        public IDeferred Every(int s, Action cb){      return Every((float) s, cb);    }
+    public IDeferred Every(float s, Action cb){      IDeferred deferred = null;      deferred = new UnityDeferred(s, () => {        cb();        if(deferred != null && !deferred.Aborted) deferred.Start();      });      deferred.Start();      return deferred;    }  }}
