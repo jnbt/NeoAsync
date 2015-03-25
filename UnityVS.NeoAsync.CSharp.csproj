@@ -65,6 +65,7 @@
     <Compile Include="Assets\NeoAsync\ITiming.cs" />
     <Compile Include="Assets\NeoAsync\Timing.cs" />
     <Compile Include="Assets\NeoAsync\UnityDeferred.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="Assets\NeoCollections.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2013\UnityVS.CSharp.targets" />
