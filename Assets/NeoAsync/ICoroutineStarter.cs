@@ -2,6 +2,10 @@ using System;
 using System.Collections;
 
 namespace Neo.Async {
+  /// <summary>
+  /// Represents a controller instance which is able to start a coroutine
+  /// based on any IEnumerator and also cancel the coroutine.
+  /// </summary>
   public interface ICoroutineStarter {
     /// <summary>
     /// Adds an coroutine via an IEnumerator
