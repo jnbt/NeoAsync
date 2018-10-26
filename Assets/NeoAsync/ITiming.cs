@@ -16,12 +16,12 @@ namespace Neo.Async {
   ///   Timing.After(5, () => UnityEngine.Debug.Log("This will be invoked in 5 seconds"));
   ///   Timing.Every(5, () => UnityEnging.Debug.Log("This will be invoked EVERY 5 seconds"));
   /// </example>
-  /// 
+  ///
   /// <remarks>
   ///   All calls return a "Deferred" object which allows calling an Abort method
   ///   will which stop the time-driven callback.
   /// </remarks>
-  public interface ITiming{
+  public interface ITiming {
     /// <summary>
     /// Builds and starts a deferral for x seconds. Than the callback is called.
     /// </summary>
