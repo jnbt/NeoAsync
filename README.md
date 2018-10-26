@@ -91,4 +91,4 @@ By using an Dependency-Injection pattern / framework (e.g. [Strange](https://git
 
 ## Testing
 
-You can run the tests using the offical [Unity Testing Tools](https://www.assetstore.unity3d.com/#/content/13802). Just install the Unity package and use the [Unit Test Runner](http://www.tallior.com/introduction-to-unity-test-tools/).
+Use Unity's embedded Test Runner via `Window -> General -> Test Runner`.
