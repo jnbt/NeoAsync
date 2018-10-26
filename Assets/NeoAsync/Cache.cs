@@ -1,5 +1,5 @@
 using System;
-using Neo.Collections;
+using System.Collections.Generic;
 
 namespace Neo.Async {
   /// <summary>
@@ -72,7 +72,11 @@ namespace Neo.Async {
     /// </summary>
     /// <param name="callback">called for every item</param>
     public void ForEach(CallbackFunction callback) {
-      storage.ForEach((_, item) => callback(item));
+      Dictionary<TKey, TValue>.Enumerator enumerator = storage.GetEnumerator();
+      while(enumerator.MoveNext()) {
+        KeyValuePair<TKey, TValue> pair = enumerator.Current;
+        callback(pair.Value);
+      }
     }
 
     /// <summary>
@@ -86,11 +90,11 @@ namespace Neo.Async {
     /// Checks if there is at least one pending call to the cache
     /// </summary>
     public bool IsPending {
-      get { return !queued.IsEmpty; }
+      get { return queued.Count > 0; }
     }
 
     private void enqueue(TKey key, CallbackFunction callback) {
-      if(queued.Has(key)) {
+      if(queued.ContainsKey(key)) {
         queued[key].Add(callback);
       } else {
         queued[key] = new List<CallbackFunction>{ callback };
@@ -100,10 +104,14 @@ namespace Neo.Async {
 
     private void onLoad(TKey key, TValue item) {
       storage[key] = item; // cache result
-      if(!queued.Has(key)) return;
-      queued[key].ForEach(cb => cb(item));
-      queued[key].Clear();
-      queued[key] = null;
+      if(!queued.ContainsKey(key)) return;
+      // prevent allocations in Unity
+      List<CallbackFunction> callbacks = queued[key];
+      for (int i = 0, imax = callbacks.Count; i < imax; i++) {
+        callbacks[i](item);
+      }
+      callbacks.Clear();
+      queued.Remove(key);
     }
 
     private void load(TKey key) {

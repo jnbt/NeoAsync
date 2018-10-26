@@ -1,6 +1,6 @@
 using System;
 using NUnit.Framework;
-using Neo.Collections;
+using System.Collections.Generic;
 using Neo.Async;
 
 namespace Tests.Neo.Async{
@@ -10,7 +10,7 @@ namespace Tests.Neo.Async{
       public readonly Dictionary<string,List<Action<string>>> Callbacks = new Dictionary<string,List<Action<string>>>();
 
       public void Get(string key, Action<string> callback){
-        if(!Callbacks.Has(key)) Callbacks[key] = new List<Action<string>>();
+        if(!Callbacks.ContainsKey(key)) Callbacks[key] = new List<Action<string>>();
         Callbacks[key].Add(callback);
       }
 
