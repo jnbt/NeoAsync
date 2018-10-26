@@ -15,18 +15,18 @@ namespace Tests.Neo.Async{
       }
 
       public void Perform(string key, string val){
-        Callbacks[key].ForEach( (callback) => callback(val) );
+        Callbacks[key].ForEach( callback => callback(val) );
         Callbacks[key].Clear();
       }
     }
 
     private FakeRepo repo;
-    private Cache<string> subject;
+    private Cache<string, string> subject;
 
     [SetUp]
     public void SetUp(){
       repo = new FakeRepo();
-      subject = new Cache<string>(repo.Get);
+      subject = new Cache<string, string>(repo.Get);
     }
 
     [Test]
@@ -36,14 +36,14 @@ namespace Tests.Neo.Async{
       string gotB1 = null;
       string gotB2 = null;
 
-      subject.Get("A", (got) => gotA1 = got);
+      subject.Get("A", got => gotA1 = got);
 
       Assert.AreEqual(1, repo.Callbacks.Count);
       Assert.AreEqual(1, repo.Callbacks["A"].Count);
       Assert.IsNull(gotA1);
       Assert.IsNull(gotA2);
 
-      subject.Get("A", (got) => gotA2 = got);
+      subject.Get("A", got => gotA2 = got);
       Assert.AreEqual(1, repo.Callbacks.Count);
       Assert.AreEqual(1, repo.Callbacks["A"].Count);
 
@@ -60,7 +60,7 @@ namespace Tests.Neo.Async{
 
       //ask for next one
 
-      subject.Get("B", (got) => gotB1 = got);
+      subject.Get("B", got => gotB1 = got);
 
       Assert.AreEqual(2, repo.Callbacks.Count);
       Assert.AreEqual(0, repo.Callbacks["A"].Count);
@@ -70,7 +70,7 @@ namespace Tests.Neo.Async{
       Assert.IsNull(gotB1);
       Assert.IsNull(gotB2);
 
-      subject.Get("B", (got) => gotB2 = got);
+      subject.Get("B", got => gotB2 = got);
       Assert.AreEqual(2, repo.Callbacks.Count);
       Assert.AreEqual(0, repo.Callbacks["A"].Count);
       Assert.AreEqual(1, repo.Callbacks["B"].Count);
@@ -92,7 +92,7 @@ namespace Tests.Neo.Async{
 
       //Ask again for A
       string gotA3 = null;
-      subject.Get("A", (got) => gotA3 = got);
+      subject.Get("A", got => gotA3 = got);
 
       Assert.AreEqual(2, repo.Callbacks.Count);
       Assert.AreEqual(0, repo.Callbacks["A"].Count);
@@ -109,7 +109,7 @@ namespace Tests.Neo.Async{
     public void Clear(){
       string gotA1 = null;
 
-      subject.Get("A", (got) => gotA1 = got);
+      subject.Get("A", got => gotA1 = got);
 
       Assert.AreEqual(1, repo.Callbacks.Count);
       Assert.AreEqual(1, repo.Callbacks["A"].Count);
@@ -122,7 +122,7 @@ namespace Tests.Neo.Async{
       Assert.AreEqual(0, repo.Callbacks["A"].Count);
 
       subject.Clear();
-      subject.Get("A", (got) => gotA1 = got);
+      subject.Get("A", got => gotA1 = got);
 
       Assert.AreEqual(1, repo.Callbacks.Count);
       Assert.AreEqual(1, repo.Callbacks["A"].Count);

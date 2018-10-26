@@ -14,44 +14,40 @@ namespace Neo.Async {
   /// <example>
   /// <![CDATA[
   ///   class SomeClass{
-  ///     private readonly Cache<UnityEngine.GameObject> cache;
+  ///     private readonly Cache<string, UnityEngine.GameObject> cache;
   ///
   ///     public SomeClass(){
-  ///       cache = new Cache<UnityEngine.GameObject>(resolveGameObject);
+  ///       cache = new Cache<string, UnityEngine.GameObject>(resolveGameObject);
   ///     }
   ///
   ///     public void Do(){
   ///       cache.Get("MyBigGameObject", (go) => go.transform.position = UnityEngine.Vector3.zero);
   ///     }
   ///
-  ///     private GameObject resolveGameObject(string key){
-  ///       UnityEngine.Resources.Load<GameObject>(key);
+  ///     private GameObject resolveGameObject(string key, Action<UnityEngine.GameObject done){
+  ///       done(UnityEngine.Resources.Load<GameObject>(key));
   ///     }
   ///   }
   /// ]]>
   /// </example>
-  /// <typeparam name="T"></typeparam>
-  public class Cache<T> {
+  /// <typeparam name="TKey">Type of key to handle cache</typeparam>
+  /// <typeparam name="TValue">Type of item value</typeparam>
+  public sealed class Cache<TKey, TValue> {
     /// <summary>
     /// Function to be called to load single items into the cache
     /// </summary>
     /// <param name="key">which is looked up</param>
     /// <param name="loader">to call when loaded</param>
-    public delegate void LoaderFunction(string key, Action<T> loader);
+    public delegate void LoaderFunction(TKey key, Action<TValue> loader);
     /// <summary>
     /// Function to be called when accessing items on the cache
     /// </summary>
     /// <param name="item">which is loaded from cache or lazy</param>
-    public delegate void CallbackFunction(T item);
+    public delegate void CallbackFunction(TValue item);
 
-    private sealed class Entry {
-      public string Key { get; set; }
-      public CallbackFunction Callback { get; set; }
-    }
-
-    private LoaderFunction loader;
-    private Dictionary<string, T> storage = new Dictionary<string, T>();
-    private List<Entry> queued = new List<Entry>();
+    private readonly LoaderFunction loader;
+    private readonly Dictionary<TKey, TValue> storage = new Dictionary<TKey, TValue>();
+    private readonly Dictionary<TKey, List<CallbackFunction>> queued = new Dictionary<TKey, List<CallbackFunction>>(); 
 
     /// <summary>
     /// Initializes a new cache which is bound to a specific loader function
@@ -62,13 +58,21 @@ namespace Neo.Async {
     }
 
     /// <summary>
-    /// Retreives an item from the cache or loads it
+    /// Receives an item from the cache or loads it
     /// </summary>
     /// <param name="key">to lookup</param>
     /// <param name="callback">to be calles when loaded</param>
-    public void Get(string key, CallbackFunction callback) {
+    public void Get(TKey key, CallbackFunction callback) {
       if(storage.ContainsKey(key)) callback(storage[key]);
       else enqueue(key, callback);
+    }
+
+    /// <summary>
+    /// Iterates over all loaded cached items
+    /// </summary>
+    /// <param name="callback">called for every item</param>
+    public void ForEach(CallbackFunction callback) {
+      storage.ForEach((_, item) => callback(item));
     }
 
     /// <summary>
@@ -78,36 +82,32 @@ namespace Neo.Async {
       storage.Clear();
     }
 
-    private void enqueue(string key, CallbackFunction callback) {
-      Entry entry = new Entry() {
-        Key = key,
-        Callback = callback
-      };
+    /// <summary>
+    /// Checks if there is at least one pending call to the cache
+    /// </summary>
+    public bool IsPending {
+      get { return !queued.IsEmpty; }
+    }
 
-      if(queued.IsEmpty) {
-        queued.Add(entry);
-        load(entry); // directly invoke the first download
+    private void enqueue(TKey key, CallbackFunction callback) {
+      if(queued.Has(key)) {
+        queued[key].Add(callback);
       } else {
-        queued.Add(entry); // all other downloads are queued, so max 1 at a time
+        queued[key] = new List<CallbackFunction>{ callback };
+        load(key); // invoke the first load per key
       }
     }
 
-    private void onLoad(string key, T item) {
+    private void onLoad(TKey key, TValue item) {
       storage[key] = item; // cache result
-      for(int i = queued.Count - 1; i >= 0; i--) { //iterate reverse to allow removeAt
-        Entry entry = queued[i];
-        if(entry.Key == key) {
-          queued.RemoveAt(i);
-          entry.Callback(item);
-        }
-      }
-      if(!queued.IsEmpty) {
-        load(queued.First);
-      }
+      if(!queued.Has(key)) return;
+      queued[key].ForEach(cb => cb(item));
+      queued[key].Clear();
+      queued[key] = null;
     }
 
-    private void load(Entry entry) {
-      loader(entry.Key, (item) => onLoad(entry.Key, item));
+    private void load(TKey key) {
+      loader(key, item => onLoad(key, item));
     }
   }
 }
