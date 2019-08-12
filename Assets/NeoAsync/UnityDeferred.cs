@@ -7,22 +7,19 @@ namespace Neo.Async {
   /// Represents a deferred call using Unity's coroutines
   /// </summary>
   public class UnityDeferred : IDeferred {
-    /// <summary>
-    /// Seconds to wait as a timeout
-    /// </summary>
+    /// <inheritdoc />
     public float Seconds { get; private set; }
-    /// <summary>
-    /// Callback to called in a deferred way
-    /// </summary>
+
+    /// <inheritdoc />
     public Action Callback { get; private set; }
-    /// <summary>
-    /// Is the deferred call already executed?
-    /// </summary>
+
+    /// <inheritdoc />
     public bool Finished { get; private set; }
-    /// <summary>
-    /// Was the deferred call aborted?
-    /// </summary>
+
+    /// <inheritdoc />
     public bool Aborted { get; private set; }
+
+    private ICoroutine runningCoroutine;
 
     /// <summary>
     /// Creates in instance which describes a deferred call
@@ -36,45 +33,44 @@ namespace Neo.Async {
       Aborted = false;
     }
 
-    /// <summary>
-    /// Start the deferred call
-    /// </summary>
+    /// <inheritdoc />
     public void Start() {
       Finished = false; // reset the state
-      if(Seconds > 0f) {
-        CoroutineStarter.Instance.Add(waitForTime());
+      if (Seconds > 0f) {
+        runningCoroutine = CoroutineStarter.Instance.Add(waitForTime());
       } else {
         Finished = true;
         callbackFailSafe();
       }
     }
 
-    /// <summary>
-    /// Abort the deferred call if not already executed
-    /// </summary>
+    /// <inheritdoc />
     public void Abort() {
+      if (!Finished && runningCoroutine != null) {
+        CoroutineStarter.Instance.Remove(runningCoroutine);
+      }
       Finished = true;
       Aborted = true;
     }
 
     private IEnumerator waitForTime() {
       yield return new WaitForSeconds(Seconds);
-      if(!Finished) {
+      if (!Finished) {
         Finished = true;
         callbackFailSafe();
       }
     }
 
     private void callbackFailSafe() {
-      if(Callback == null) return;
+      if (Callback == null) return;
       try {
         Callback();
         // As timing is often used in combination with UI
         // handle the common exception of already destroyed GameObjects
         // to no block the game.
         // All other exceptions are intentionally not catched.
-      } catch(MissingReferenceException ex) {
-        UnityEngine.Debug.LogWarning(ex.Message);
+      } catch (MissingReferenceException ex) {
+        Debug.Log(ex.Message);
       }
     }
   }

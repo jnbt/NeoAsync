@@ -4,28 +4,26 @@ NeoAsync is a growing toolset to manage asynchronous tasks when programming in U
 
 ## Installation
 
-If you don't have access to [Microsoft VisualStudio](http://msdn.microsoft.com/de-de/vstudio) you can just use Unity3D and its compiler.
-Or use your VisualStudio installation in combination with [Visual Studio Tools for Unity](http://unityvs.com) to compile a DLL-file, which
-can be included into your project.
+You can either use to copy the source files of this project into your Unity3D project or use Visual Studio to compile a DLL-file to be included in your project.
 
 ### Using Unity3D
 
 * Clone the repository
-* Copy the files from `Assets\NeoAsync` into your project
+* Copy the files from `Assets\NeoNetwork` into your project
+  * This folder also includes an Assembly definition file
 
 ### Using VisualStudio
 
 * Clone the repository
-* Open the folder as a Unity3D project
-* Install the *free* [Unity Testing Tools](https://www.assetstore.unity3d.com/#/content/13802) from the AssetStore
-* Install the *free* [Visual Studio Tools for Unity](http://unityvs.com) and import its Unity-package
-* Open `UnityVS.NeoAsync.sln`
-* [Build a DLL-File](http://forum.unity3d.com/threads/video-tutorial-how-to-use-visual-studio-for-all-your-unity-development.120327)
-* Import the DLL and dependencies into your Unity3D project
+* Open `NeoAsync.sln` with Visual Studio
+* Build the solution using "Build -> Build NeoAsync"
+* Import the DLL (`obj/Release/NeoAsync.dll`) into your Unity3D project
 
-## Dependencies
+Hint: Unity currently always reset the LangVersion to "7.3" which isn't supported by Visual Studio. Therefor you need to manually
+set / revert the `LangVersion` to `6` in `NeoAsync.csproj`:
 
-* [NeoCollections](https://github.com/jnbt/NeoCollections)
+    <LangVersion>6</LangVersion>
+
 
 ## Usage
 
@@ -87,8 +85,8 @@ Timing.Every(5, () => UnityEnging.Debug.Log("This will be invoked EVERY 5 second
 
 ```
 
-By using an Dependency-Injection pattern / framework (e.g. [Strange](https://github.com/strangeioc/strangeioc)) unit-testing the timing behavior is so easy.
+By using an Dependency-Injection pattern / framework (e.g. [Strange](https://github.com/strangeioc/strangeioc)) unit-testing the timing behavior is easy.
 
 ## Testing
 
-You can run the tests using the offical [Unity Testing Tools](https://www.assetstore.unity3d.com/#/content/13802). Just install the Unity package and use the [Unit Test Runner](http://www.tallior.com/introduction-to-unity-test-tools/).
+Use Unity's embedded Test Runner via `Window -> General -> Test Runner`.
