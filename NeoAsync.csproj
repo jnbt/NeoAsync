@@ -58,6 +58,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\NeoAsync\AssemblyInfo.cs" />
      <Compile Include="Assets\NeoAsync\Cache.cs" />
      <Compile Include="Assets\NeoAsync\CoroutineStarter.cs" />
      <Compile Include="Assets\NeoAsync\ICoroutine.cs" />
